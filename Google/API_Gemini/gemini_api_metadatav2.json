@@ -1,0 +1,587 @@
+{
+  "metadata": {
+    "generated_date": "2025-12-19",
+    "source_verification": "https://ai.google.dev/gemini-api/docs/models",
+    "api_version": "v1beta",
+    "last_updated_models": [
+      "gemini-2.5-pro",
+      "gemini-2.5-flash",
+      "gemini-2.5-flash-lite",
+      "gemini-2.5-flash-image",
+      "gemini-2.5-flash-native-audio-preview-12-2025",
+      "gemini-2.5-flash-preview-tts",
+      "gemini-2.5-pro-preview-tts",
+      "gemini-2.5-computer-use-preview-10-2025"
+    ],
+    "deprecated_models": [
+      "gemini-2.0-flash",
+      "gemini-2.0-flash-lite"
+    ]
+  },
+  "models": {
+    "gemini-2.5-pro": {
+      "description": "Most capable model for complex reasoning, coding, and multimodal tasks",
+      "context_window": 2097152,
+      "max_output_tokens": 65536,
+      "input_modalities": ["text", "image", "video", "audio", "code"],
+      "output_modalities": ["text", "code"],
+      "knowledge_cutoff": "2025-08",
+      "pricing": {
+        "input_cost_per_million": 1.25,
+        "output_cost_per_million": 10.00,
+        "currency": "USD"
+      },
+      "rate_limits": {
+        "requests_per_minute": 100,
+        "tokens_per_minute": 1000000,
+        "requests_per_day": 50000
+      },
+      "capabilities": [
+        "advanced_reasoning",
+        "code_generation",
+        "multimodal_analysis",
+        "long_context_understanding",
+        "function_calling",
+        "json_mode",
+        "system_instructions"
+      ],
+      "supported_regions": ["global"],
+      "status": "stable"
+    },
+    "gemini-2.5-flash": {
+      "description": "Fast, cost-effective model for high-volume tasks with strong performance",
+      "context_window": 1048576,
+      "max_output_tokens": 65536,
+      "input_modalities": ["text", "image", "video", "audio", "code"],
+      "output_modalities": ["text", "code"],
+      "knowledge_cutoff": "2025-08",
+      "pricing": {
+        "input_cost_per_million": 0.15,
+        "output_cost_per_million": 0.60,
+        "currency": "USD"
+      },
+      "rate_limits": {
+        "requests_per_minute": 1000,
+        "tokens_per_minute": 4000000,
+        "requests_per_day": 500000
+      },
+      "capabilities": [
+        "fast_inference",
+        "code_generation",
+        "multimodal_analysis",
+        "function_calling",
+        "json_mode",
+        "system_instructions",
+        "native_tool_use"
+      ],
+      "supported_regions": ["global"],
+      "status": "stable"
+    },
+    "gemini-2.5-flash-lite": {
+      "description": "Lightweight version optimized for speed and cost efficiency",
+      "context_window": 1048576,
+      "max_output_tokens": 8192,
+      "input_modalities": ["text", "image"],
+      "output_modalities": ["text"],
+      "knowledge_cutoff": "2025-08",
+      "pricing": {
+        "input_cost_per_million": 0.10,
+        "output_cost_per_million": 0.40,
+        "currency": "USD"
+      },
+      "rate_limits": {
+        "requests_per_minute": 2000,
+        "tokens_per_minute": 8000000,
+        "requests_per_day": 1000000
+      },
+      "capabilities": [
+        "ultra_fast_inference",
+        "basic_reasoning",
+        "text_generation",
+        "simple_multimodal"
+      ],
+      "supported_regions": ["global"],
+      "status": "stable"
+    },
+    "gemini-2.5-flash-image": {
+      "description": "Specialized model for image generation (Nano Banana)",
+      "context_window": 32768,
+      "max_output_tokens": 4096,
+      "input_modalities": ["text", "image"],
+      "output_modalities": ["image"],
+      "knowledge_cutoff": "2025-08",
+      "pricing": {
+        "input_cost_per_million": 0.20,
+        "output_cost_per_image": 0.05,
+        "currency": "USD"
+      },
+      "rate_limits": {
+        "requests_per_minute": 500,
+        "images_per_day": 10000
+      },
+      "capabilities": [
+        "image_generation",
+        "image_editing",
+        "style_transfer",
+        "high_resolution_output"
+      ],
+      "supported_regions": ["global"],
+      "status": "stable",
+      "alias": "nano-banana"
+    },
+    "gemini-2.5-flash-native-audio-preview-12-2025": {
+      "description": "Preview model for native audio understanding and generation",
+      "context_window": 1048576,
+      "max_output_tokens": 65536,
+      "input_modalities": ["text", "audio", "image"],
+      "output_modalities": ["text", "audio"],
+      "knowledge_cutoff": "2025-12",
+      "pricing": {
+        "input_cost_per_million": 0.20,
+        "output_cost_per_million": 0.80,
+        "currency": "USD"
+      },
+      "rate_limits": {
+        "requests_per_minute": 100,
+        "tokens_per_minute": 500000,
+        "requests_per_day": 10000
+      },
+      "capabilities": [
+        "native_audio_understanding",
+        "speech_to_text",
+        "text_to_speech",
+        "real_time_audio_processing",
+        "multimodal_reasoning"
+      ],
+      "supported_regions": ["us-central1", "europe-west1"],
+      "status": "preview",
+      "preview_expires": "2026-06-30"
+    },
+    "gemini-2.5-flash-preview-tts": {
+      "description": "Preview model specialized for text-to-speech generation",
+      "context_window": 32768,
+      "max_output_tokens": 8192,
+      "input_modalities": ["text"],
+      "output_modalities": ["audio"],
+      "knowledge_cutoff": "2025-12",
+      "pricing": {
+        "input_cost_per_million": 0.15,
+        "output_cost_per_minute_audio": 0.02,
+        "currency": "USD"
+      },
+      "rate_limits": {
+        "requests_per_minute": 200,
+        "minutes_audio_per_day": 1000
+      },
+      "capabilities": [
+        "high_quality_tts",
+        "voice_cloning",
+        "emotion_control",
+        "multi_language_support"
+      ],
+      "supported_regions": ["global"],
+      "status": "preview",
+      "preview_expires": "2026-06-30"
+    },
+    "gemini-2.5-pro-preview-tts": {
+      "description": "Premium preview model for advanced text-to-speech with reasoning",
+      "context_window": 2097152,
+      "max_output_tokens": 65536,
+      "input_modalities": ["text", "image"],
+      "output_modalities": ["text", "audio"],
+      "knowledge_cutoff": "2025-12",
+      "pricing": {
+        "input_cost_per_million": 1.50,
+        "output_cost_per_minute_audio": 0.05,
+        "currency": "USD"
+      },
+      "rate_limits": {
+        "requests_per_minute": 50,
+        "minutes_audio_per_day": 500
+      },
+      "capabilities": [
+        "advanced_tts",
+        "contextual_voice_generation",
+        "multimodal_reasoning",
+        "voice_cloning",
+        "emotion_control"
+      ],
+      "supported_regions": ["us-central1", "europe-west1"],
+      "status": "preview",
+      "preview_expires": "2026-06-30"
+    },
+    "gemini-2.5-computer-use-preview-10-2025": {
+      "description": "Preview model for autonomous computer interaction and tool use",
+      "context_window": 2097152,
+      "max_output_tokens": 65536,
+      "input_modalities": ["text", "image", "screen_capture"],
+      "output_modalities": ["text", "action_commands"],
+      "knowledge_cutoff": "2025-10",
+      "pricing": {
+        "input_cost_per_million": 2.00,
+        "output_cost_per_million": 15.00,
+        "currency": "USD"
+      },
+      "rate_limits": {
+        "requests_per_minute": 20,
+        "tokens_per_minute": 200000,
+        "requests_per_day": 5000
+      },
+      "capabilities": [
+        "autonomous_computer_control",
+        "gui_understanding",
+        "tool_execution",
+        "multi_step_planning",
+        "screenshot_analysis"
+      ],
+      "supported_regions": ["us-central1"],
+      "status": "preview",
+      "preview_expires": "2026-04-30"
+    }
+  },
+  "api_endpoints": {
+    "base_url": "https://generativelanguage.googleapis.com/v1beta",
+    "generate_content": "/models/{model}:generateContent",
+    "stream_generate_content": "/models/{model}:streamGenerateContent",
+    "count_tokens": "/models/{model}:countTokens",
+    "embed_content": "/models/{model}:embedContent",
+    "batch_embed_contents": "/models/{model}:batchEmbedContents",
+    "cache_create": "/caches",
+    "cache_get": "/caches/{cacheId}",
+    "cache_update": "/caches/{cacheId}",
+    "cache_delete": "/caches/{cacheId}"
+  },
+  "authentication": {
+    "method": "API_KEY",
+    "header_name": "x-goog-api-key",
+    "alternative_method": "OAuth_2.0",
+    "oauth_scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/generative-language.retriever"
+    ],
+    "service_account_supported": true
+  },
+  "sdk_support": {
+    "python": {
+      "package_name": "google-generativeai",
+      "latest_version": "0.8.3",
+      "install_command": "pip install -U google-generativeai",
+      "import_statement": "import google.generativeai as genai",
+      "github_repo": "https://github.com/google-gemini/generative-ai-python"
+    },
+    "nodejs": {
+      "package_name": "@google/generative-ai",
+      "latest_version": "0.21.0",
+      "install_command": "npm install @google/generative-ai",
+      "import_statement": "const { GoogleGenerativeAI } = require('@google/generative-ai')",
+      "github_repo": "https://github.com/google-gemini/generative-ai-js"
+    },
+    "android": {
+      "package_name": "com.google.ai.client.generativeai",
+      "latest_version": "1.0.0",
+      "gradle_dependency": "implementation 'com.google.ai.client.generativeai:generativeai:1.0.0'",
+      "min_sdk_version": 26
+    },
+    "ios": {
+      "package_name": "GoogleGenerativeAI",
+      "latest_version": "1.0.0",
+      "swift_package": "https://github.com/google-gemini/generative-ai-swift",
+      "cocoapods": "pod 'GoogleGenerativeAI'",
+      "min_ios_version": "15.0"
+    },
+    "go": {
+      "package_name": "github.com/google/generative-ai-go",
+      "latest_version": "0.14.1",
+      "install_command": "go get github.com/google/generative-ai-go/genai"
+    },
+    "dart": {
+      "package_name": "google_generative_ai",
+      "latest_version": "1.0.0",
+      "pub_spec": "google_generative_ai: ^1.0.0"
+    }
+  },
+  "request_format": {
+    "generate_content": {
+      "method": "POST",
+      "content_type": "application/json",
+      "body_structure": {
+        "contents": [
+          {
+            "role": "user|model",
+            "parts": [
+              {"text": "string"},
+              {"inline_data": {"mime_type": "string", "data": "base64_string"}},
+              {"file_data": {"file_uri": "string", "mime_type": "string"}}
+            ]
+          }
+        ],
+        "generation_config": {
+          "temperature": "float (0.0-2.0)",
+          "top_p": "float (0.0-1.0)",
+          "top_k": "integer",
+          "max_output_tokens": "integer",
+          "stop_sequences": ["array of strings"],
+          "response_mime_type": "text/plain|application/json",
+          "response_schema": "object (for JSON mode)"
+        },
+        "safety_settings": [
+          {
+            "category": "HARM_CATEGORY_HATE_SPEECH|HARM_CATEGORY_DANGEROUS_CONTENT|HARM_CATEGORY_HARASSMENT|HARM_CATEGORY_SEXUALLY_EXPLICIT",
+            "threshold": "BLOCK_NONE|BLOCK_ONLY_HIGH|BLOCK_MEDIUM_AND_ABOVE|BLOCK_LOW_AND_ABOVE"
+          }
+        ],
+        "tools": [
+          {
+            "function_declarations": [
+              {
+                "name": "string",
+                "description": "string",
+                "parameters": "JSON Schema object"
+              }
+            ]
+          },
+          {
+            "google_search_retrieval": {}
+          },
+          {
+            "code_execution": {}
+          }
+        ],
+        "tool_config": {
+          "function_calling_config": {
+            "mode": "AUTO|ANY|NONE",
+            "allowed_function_names": ["array of strings"]
+          }
+        },
+        "system_instruction": {
+          "parts": [{"text": "string"}]
+        },
+        "cached_content": "string (cache name)"
+      }
+    }
+  },
+  "response_format": {
+    "generate_content": {
+      "candidates": [
+        {
+          "content": {
+            "role": "model",
+            "parts": [
+              {"text": "string"},
+              {"function_call": {"name": "string", "args": "object"}},
+              {"executable_code": {"language": "string", "code": "string"}},
+              {"code_execution_result": {"outcome": "string", "output": "string"}}
+            ]
+          },
+          "finish_reason": "STOP|MAX_TOKENS|SAFETY|RECITATION|BLOCKLIST|PROHIBITED_CONTENT|SPII|MALFORMED_FUNCTION_CALL",
+          "safety_ratings": [
+            {
+              "category": "string",
+              "probability": "NEGLIGIBLE|LOW|MEDIUM|HIGH",
+              "blocked": "boolean",
+              "severity": "HARM_SEVERITY_NEGLIGIBLE|HARM_SEVERITY_LOW|HARM_SEVERITY_MEDIUM|HARM_SEVERITY_HIGH"
+            }
+          ],
+          "token_count": "integer",
+          "index": "integer"
+        }
+      ],
+      "prompt_feedback": {
+        "block_reason": "string",
+        "safety_ratings": ["array"],
+        "citation_metadata": "object"
+      },
+      "usage_metadata": {
+        "prompt_token_count": "integer",
+        "cached_content_token_count": "integer",
+        "candidates_token_count": "integer",
+        "total_token_count": "integer"
+      }
+    }
+  },
+  "safety_filters": {
+    "categories": [
+      "HARM_CATEGORY_HATE_SPEECH",
+      "HARM_CATEGORY_DANGEROUS_CONTENT",
+      "HARM_CATEGORY_HARASSMENT",
+      "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+      "HARM_CATEGORY_CIVIC_INTEGRITY"
+    ],
+    "thresholds": [
+      "BLOCK_NONE",
+      "BLOCK_ONLY_HIGH",
+      "BLOCK_MEDIUM_AND_ABOVE",
+      "BLOCK_LOW_AND_ABOVE"
+    ],
+    "severity_levels": [
+      "HARM_SEVERITY_NEGLIGIBLE",
+      "HARM_SEVERITY_LOW",
+      "HARM_SEVERITY_MEDIUM",
+      "HARM_SEVERITY_HIGH"
+    ]
+  },
+  "features": {
+    "function_calling": {
+      "supported": true,
+      "parallel_calls": true,
+      "automatic_function_calling": true,
+      "max_functions_per_request": 128
+    },
+    "code_execution": {
+      "supported": true,
+      "sandboxed_environment": true,
+      "supported_languages": ["python"],
+      "timeout_seconds": 30,
+      "output_limit_bytes": 10240
+    },
+    "json_mode": {
+      "supported": true,
+      "schema_validation": true,
+      "response_mime_type": "application/json"
+    },
+    "context_caching": {
+      "supported": true,
+      "min_tokens_for_cache": 32768,
+      "max_cache_duration_hours": 48,
+      "cache_ttl_seconds": 172800
+    },
+    "vision": {
+      "supported": true,
+      "image_formats": ["PNG", "JPEG", "WEBP", "HEIC", "HEIF"],
+      "max_images_per_request": 16,
+      "video_support": true,
+      "video_max_length_minutes": 60,
+      "video_formats": ["MP4", "MOV", "AVI", "MKV", "WEBM"]
+    },
+    "audio": {
+      "supported": true,
+      "audio_formats": ["WAV", "MP3", "AIFF", "AAC", "OGG", "FLAC"],
+      "max_audio_length_minutes": 960,
+      "native_audio_models": ["gemini-2.5-flash-native-audio-preview-12-2025"]
+    },
+    "grounding": {
+      "supported": true,
+      "google_search_integration": true,
+      "vertex_ai_search_integration": true,
+      "custom_retrieval": true
+    },
+    "multilingual": {
+      "supported_languages": 100,
+      "primary_languages": ["en", "es", "fr", "de", "ja", "zh", "ko", "pt", "it", "ru", "ar", "hi"]
+    }
+  },
+  "quotas_and_limits": {
+    "free_tier": {
+      "requests_per_minute": 15,
+      "requests_per_day": 1500,
+      "file_uploads_per_day": 50
+    },
+    "pay_as_you_go": {
+      "requests_per_minute_default": 1000,
+      "requests_per_day_default": 50000,
+      "increase_available": true
+    },
+    "enterprise": {
+      "custom_limits": true,
+      "sla_available": true,
+      "dedicated_support": true
+    },
+    "file_size_limits": {
+      "max_image_size_mb": 20,
+      "max_video_size_mb": 2048,
+      "max_audio_size_mb": 512,
+      "max_pdf_size_mb": 30,
+      "max_text_file_size_mb": 30
+    }
+  },
+  "monitoring_metrics": {
+    "recommended_metrics": [
+      "latency_p50",
+      "latency_p95",
+      "latency_p99",
+      "error_rate",
+      "token_usage_input",
+      "token_usage_output",
+      "cost_per_request",
+      "cache_hit_rate",
+      "function_call_success_rate",
+      "safety_filter_trigger_rate"
+    ],
+    "alerting_thresholds": {
+      "error_rate_percent": 5,
+      "latency_p95_ms": 5000,
+      "cost_spike_percent": 200
+    }
+  },
+  "best_practices": {
+    "performance": [
+      "Use context caching for repeated prompts",
+      "Stream responses for better UX",
+      "Batch embeddings when possible",
+      "Choose appropriate model for task complexity",
+      "Set reasonable max_output_tokens"
+    ],
+    "cost_optimization": [
+      "Use gemini-2.5-flash for simple tasks",
+      "Implement token counting before API calls",
+      "Cache frequently used contexts",
+      "Monitor and alert on unusual usage patterns",
+      "Use JSON mode to reduce output tokens"
+    ],
+    "security": [
+      "Never expose API keys in client-side code",
+      "Use environment variables for secrets",
+      "Implement rate limiting on your end",
+      "Validate all user inputs",
+      "Review safety filter settings",
+      "Rotate API keys regularly"
+    ],
+    "reliability": [
+      "Implement exponential backoff for retries",
+      "Handle all error types gracefully",
+      "Set appropriate timeouts",
+      "Log all requests and responses for debugging",
+      "Monitor quota usage proactively"
+    ]
+  },
+  "changelog_recent": [
+    {
+      "date": "2025-12-15",
+      "update": "Gemini 2.5 Flash Native Audio Preview launched with real-time audio processing"
+    },
+    {
+      "date": "2025-12-01",
+      "update": "Gemini 2.5 Pro TTS Preview expanded to Europe regions"
+    },
+    {
+      "date": "2025-11-20",
+      "update": "Computer Use Preview updated with improved GUI understanding"
+    },
+    {
+      "date": "2025-10-15",
+      "update": "Gemini 2.5 Flash-Lite released for ultra-low latency applications"
+    },
+    {
+      "date": "2025-09-30",
+      "update": "Context caching duration extended to 48 hours"
+    },
+    {
+      "date": "2025-09-01",
+      "update": "Gemini 2.5 Pro and Flash stable release with 2M and 1M context windows"
+    }
+  ],
+  "resources": {
+    "documentation": "https://ai.google.dev/gemini-api/docs",
+    "models_overview": "https://ai.google.dev/gemini-api/docs/models",
+    "quickstart": "https://ai.google.dev/gemini-api/docs/quickstart",
+    "python_guide": "https://ai.google.dev/gemini-api/docs/sdks/python-guide",
+    "nodejs_guide": "https://ai.google.dev/gemini-api/docs/sdks/nodejs-guide",
+    "pricing": "https://ai.google.dev/pricing",
+    "policies": "https://ai.google.dev/terms",
+    "github_python": "https://github.com/google-gemini/generative-ai-python",
+    "github_nodejs": "https://github.com/google-gemini/generative-ai-js",
+    "github_swift": "https://github.com/google-gemini/generative-ai-swift",
+    "colab_examples": "https://github.com/google-gemini/cookbook",
+    "discord_community": "https://discord.gg/google-ai"
+  }
+}
