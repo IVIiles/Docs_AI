@@ -8,10 +8,40 @@
 ## Table des Matières
 
 1. [Quickstart](#1-quickstart)
+   - [Installation du SDK](#11-installation-du-sdk-google-generative-ai)
+   - [Authentification](#12-authentification)
+   - [Premier Appel API](#13-premier-appel-api)
+   - [Modèles Disponibles](#14-modèles-disponibles-décembre-2025)
 2. [Architecture](#2-architecture)
+   - [Composants Principaux](#21-composants-principaux)
+   - [Flux de Données](#22-flux-de-données)
+   - [Formats de Données et Limites](#23-formats-de-données-supportés-et-limites)
+   - [Endpoints API](#24-endpoints-api)
 3. [Implémentation](#3-implémentation)
+   - [Configuration Avancée](#31-configuration-avancée)
+   - [Gestion d'Erreurs](#32-gestion-derreurs)
+   - [Context Caching](#33-utilisation-du-context-caching)
+   - [Code Execution](#34-code-execution-exécution-de-code-python)
+   - [Batch API](#35-batch-api-réduction-50-des-coûts)
+   - [Function Calling](#36-function-calling-appel-de-fonctions)
+   - [Grounding](#37-grounding-ancrage-via-google-search)
+   - [Response Schema](#38-response-schema-json-structuré)
 4. [Optimisation](#4-optimisation)
+   - [Optimisation des Tokens](#41-optimisation-des-tokens)
+   - [Stratégies de Cache](#42-stratégies-de-cache)
+   - [Choix du Modèle](#43-choix-du-modèle)
+   - [Parallelisation](#44-parallelisation)
 5. [Maintenance](#5-maintenance)
+   - [Monitoring](#51-monitoring)
+   - [Rotation Clés API](#52-rotation-clés-api)
+   - [Versions de Modèles et Cycle de Vie](#53-versions-de-modèles-et-cycle-de-vie)
+   - [Ressources Officielles](#54-ressources-officielles)
+
+**Annexes :**
+- [Annexe A : Tarifs](#annexe-a--tarifs-décembre-2025)
+- [Annexe B : Rate Limits](#annexe-b--rate-limits-tier-1-gratuit)
+- [Annexe C : Limites Techniques par Type de Fichier](#annexe-c--limites-techniques-par-type-de-fichier)
+- [Annexe D : Catégories de Sécurité](#annexe-d--catégories-de-sécurité-disponibles)
 
 ---
 
@@ -21,10 +51,10 @@
 
 #### Python (Python 3.9+)
 ```bash
-pip install -q -U google-generativeai
+pip install -q -U google-genai
 ```
 
-> **Note** : Le package officiel est `google-generativeai` (importé comme `genai`).
+> **Note** : Le package officiel est `google-genai` (importé comme `genai`).
 
 #### JavaScript/Node.js (Node.js v18+)
 ```bash
@@ -40,13 +70,49 @@ npm install @google/genai
 </dependency>
 ```
 
+#### Go
+```bash
+go get github.com/google/generative-ai-go/genai
+```
+
+#### .NET
+```bash
+dotnet add package Google.GenAI
+```
+
+#### Dart/Flutter
+Le package `google_generative_ai` est déprécié. Utilisez [Genkit Dart](https://genkit.dev/docs/dart/get-started/) ou [Firebase AI Logic](https://pub.dev/packages/firebase_ai).
+
+#### Android et iOS (Swift)
+Pour le développement mobile, utilisez Firebase AI Logic ou Genkit. Les SDK natifs directs ne sont plus recommandés.
+
 ### 1.2 Authentification
 
+#### Clé API (Développement et Tests)
 1. **Obtenir une clé API** : Rendez-vous sur [Google AI Studio](https://aistudio.google.com/apikey)
 2. **Configurer la variable d'environnement** :
    ```bash
    export GEMINI_API_KEY="votre-clé-api"
    ```
+
+#### OAuth 2.0 (Production - Accès Utilisateur)
+Pour une gestion des accès plus fine avec consentement utilisateur :
+- Utilisez le flux OAuth 2.0 pour obtenir un token d'accès
+- Nécessite la configuration dans Google Cloud Console
+- Idéal pour les applications accédant aux données utilisateurs
+
+#### Comptes de Service (Production - Serveur à Serveur)
+Recommandé pour les déploiements serveur à serveur en entreprise :
+```python
+from google.auth import default
+from google import genai
+
+credentials, project = default()
+client = genai.Client(credentials=credentials)
+```
+- Configurez dans Google Cloud Console > IAM & Admin > Service Accounts
+- Téléchargez le fichier JSON de clé
+- Définissez `GOOGLE_APPLICATION_CREDENTIALS` pointant vers le fichier JSON
 
 ### 1.3 Premier Appel API
 
@@ -79,24 +145,30 @@ console.log(response.text);
 
 ### 1.4 Modèles Disponibles (Décembre 2025)
 
-| Modèle | Type | Contexte | Sortie Max | Knowledge Cutoff | Statut |
-|--------|------|----------|------------|------------------|--------|
-| `gemini-2.5-pro` | Polyvalent (code, raisonnement) | 2,097,152 tokens | 65,536 tokens | Août 2025 | Stable |
-| `gemini-2.5-flash` | Rapide, haute performance | 1,048,576 tokens | 65,536 tokens | Août 2025 | Stable |
-| `gemini-2.5-flash-lite` | Optimisé coût/volume | 1,048,576 tokens | 65,536 tokens | Août 2025 | Stable |
-| `gemini-2.5-flash-image` | Génération d'images (Nano Banana) | Variable | Variable | Août 2025 | Stable |
-| `gemini-2.5-flash-native-audio-preview-12-2025` | Audio natif (Live API) | Variable | Variable | Décembre 2025 | Preview |
-| `gemini-2.5-flash-preview-tts` | Text-to-Speech | Variable | Variable | Décembre 2025 | Preview |
-| `gemini-2.5-pro-preview-tts` | TTS Pro | Variable | Variable | Décembre 2025 | Preview |
-| `gemini-2.5-computer-use-preview-10-2025` | Agent informatique | Variable | Variable | Août 2025 | Preview |
+| Modèle | Type | Contexte | Sortie Max | Knowledge Cutoff | Statut | Expiration |
+|--------|------|----------|------------|------------------|--------|------------|
+| `gemini-2.5-pro` | Polyvalent (code, raisonnement) | 2,097,152 tokens | 65,536 tokens | Août 2025 | Stable | - |
+| `gemini-2.5-flash` | Rapide, haute performance | 1,048,576 tokens | 65,536 tokens | Août 2025 | Stable | - |
+| `gemini-2.5-flash-lite` | Optimisé coût/volume | 1,048,576 tokens | 65,536 tokens | Août 2025 | Stable | - |
+| `gemini-2.5-flash-image` | Génération d'images (Nano Banana) | Variable | Variable | Août 2025 | Stable | - |
+| `gemini-2.5-flash-native-audio-preview-12-2025` | Audio natif (Live API) | Variable | Variable | Décembre 2025 | Preview | 30 juin 2026 |
+| `gemini-2.5-flash-preview-tts` | Text-to-Speech | Variable | Variable | Décembre 2025 | Preview | 30 juin 2026 |
+| `gemini-2.5-pro-preview-tts` | TTS Pro | Variable | Variable | Décembre 2025 | Preview | 30 juin 2026 |
+| `gemini-2.5-computer-use-preview-10-2025` | Agent informatique | Variable | Variable | Août 2025 | Preview | 30 avril 2026 |
+| `gemini-robotics-er-1.5-preview` | Robotique | Variable | Variable | - | Preview | 30 avril 2026 |
 
 **Notes importantes :**
 - **gemini-2.5-pro** supporte désormais jusqu'à **2,097,152 tokens** de contexte (2M+), un argument majeur pour les documents très longs.
 - **Knowledge Cutoff** : Août 2025 pour la série 2.5 standard, Décembre 2025 pour les modèles audio preview.
+- **Expiration des modèles Preview** : Les modèles en version preview ont une date d'expiration définie. Prévoyez la migration vers les versions stables avant ces dates.
 
 **Modèles Dépréciés :**
 - `gemini-2.0-flash` → Déprécié
 - `gemini-2.0-flash-lite` → Déprécié
+
+**Disponibilité Régionale :**
+- Certains modèles preview (notamment `computer-use` et `native-audio`) peuvent être restreints à des régions spécifiques comme `us-central1` ou `europe-west1`.
+- Vérifiez la disponibilité dans votre région avant déploiement en production.
 
 ---
 
@@ -145,16 +217,18 @@ console.log(response.text);
 4. **Streaming** : Renvoi token par token (optionnel)
 5. **Post-processing** : Formatage réponse JSON/texte
 
-### 2.3 Formats de Données Supportés
+### 2.3 Formats de Données Supportés et Limites
 
-| Type | Formats Acceptés |
-|------|------------------|
-| **Texte** | UTF-8, Markdown, Code |
-| **Images** | PNG, JPEG, WebP, GIF |
-| **Vidéo** | MP4, MOV, AVI (extraction frames) |
-| **Audio** | WAV, MP3, FLAC, AAC |
-| **Documents** | PDF, TXT, HTML, MD |
-| **Code** | Tous langages majeurs |
+| Type | Formats Acceptés | Taille Max | Quantité Max |
+|------|------------------|------------|--------------|
+| **Texte** | UTF-8, Markdown, Code | - | Selon contexte modèle |
+| **Images** | PNG, JPEG, WebP, GIF | 20 MB | 16 images par requête |
+| **Vidéo** | MP4, MOV, AVI (extraction frames) | 2048 MB | 60 minutes max |
+| **Audio** | WAV, MP3, FLAC, AAC | 512 MB | - |
+| **Documents** | PDF, TXT, HTML, MD | 30 MB | - |
+| **Code** | Tous langages majeurs | - | Selon contexte modèle |
+
+**Note** : Le dépassement des limites de taille peut entraîner des erreurs `400 Bad Request`.
 
 ### 2.4 Endpoints API
 
@@ -194,6 +268,10 @@ response = client.models.generate_content(
             SafetySetting(
                 category=HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
                 threshold=HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE
+            ),
+            SafetySetting(
+                category=HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY,
+                threshold=HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE
             )
         ],
         system_instruction="Tu es un expert en développement Python.",
@@ -201,6 +279,8 @@ response = client.models.generate_content(
     )
 )
 ```
+
+**Note sur les filtres de sécurité** : La catégorie `HARM_CATEGORY_CIVIC_INTEGRITY` est disponible pour filtrer le contenu lié à la désinformation civique et électorale.
 
 #### JavaScript - Streaming
 ```javascript
@@ -268,7 +348,41 @@ response = client.models.generate_content(
 
 **Avantage** : Réduction de 90% du coût pour les tokens cachés.
 
-### 3.4 Batch API (Réduction 50% des coûts)
+### 3.4 Code Execution (Exécution de Code Python)
+
+Le **Code Execution** permet au modèle d'écrire et d'exécuter du code Python dans un environnement sandbox pour résoudre des problèmes mathématiques complexes ou traiter des données.
+
+```python
+from google import genai
+from google.genai.types import GenerateContentConfig, CodeExecution
+
+client = genai.Client()
+
+# Activer l'exécution de code
+response = client.models.generate_content(
+    model="gemini-2.5-pro",
+    contents="Calcule la somme des 1000 premiers nombres premiers et affiche le résultat",
+    config=GenerateContentConfig(
+        tools=[CodeExecution()]
+    )
+)
+
+print(response.text)
+```
+
+**Contraintes :**
+- **Langage supporté** : Python uniquement
+- **Temps d'exécution maximum** : 30 secondes par exécution
+- **Taille de sortie maximale** : 10 KB
+- Le code est exécuté dans un environnement sandbox isolé
+
+**Cas d'usage typiques :**
+- Calculs mathématiques complexes
+- Analyse et traitement de données
+- Visualisations et graphiques
+- Vérification de résultats numériques
+
+### 3.5 Batch API (Réduction 50% des coûts)
 
 ```python
 from google.genai.types import BatchJobConfig
@@ -286,7 +400,7 @@ while job.state == "RUNNING":
 results = client.batches.results.get(job.name)
 ```
 
-### 3.5 Function Calling (Appel de Fonctions)
+### 3.6 Function Calling (Appel de Fonctions)
 
 Le **Function Calling** permet au modèle d'interagir avec des outils externes (bases de données, APIs tierces) pour créer de véritables agents opérationnels.
 
@@ -386,7 +500,7 @@ if (response.functionCalls) {
 - Exécution de commandes système
 - Interactions avec services externes
 
-### 3.6 Grounding (Ancrage via Google Search)
+### 3.7 Grounding (Ancrage via Google Search)
 
 Le **Grounding** permet au modèle de vérifier ses réponses en temps réel sur le web via l'outil `google_search_retrieval`, réduisant les hallucinations.
 
@@ -451,7 +565,7 @@ if (response.groundingMetadata?.groundingChunks) {
 - Citations automatiques des sources
 - Idéal pour : actualités, faits récents, données vérifiées
 
-### 3.7 Response Schema (JSON Structuré)
+### 3.8 Response Schema (JSON Structuré)
 
 Pour garantir un format JSON valide, utilisez un **Response Schema** qui définit la structure attendue.
 
@@ -569,13 +683,20 @@ export GEMINI_API_KEY_NEW="nouvelle-clé"
 export GEMINI_API_KEY="$GEMINI_API_KEY_NEW"
 ```
 
-### 5.3 Versions de Modèles
+### 5.3 Versions de Modèles et Cycle de Vie
 
-| Version | Support | Migration |
-|---------|---------|-----------|
-| Stable | Illimité | Non |
-| Preview | 6 mois | Oui avant EOL |
-| Deprecated | 90 jours | **Urgent** |
+| Version | Support | Migration | Notes |
+|---------|---------|-----------|-------|
+| Stable | Illimité | Non | - |
+| Preview | 6 mois | Oui avant EOL | Dates d'expiration définies |
+| Deprecated | 90 jours | **Urgent** | Planifier migration immédiate |
+
+**Dates d'expiration des modèles Preview :**
+- `gemini-2.5-flash-native-audio-preview` : 30 juin 2026
+- `gemini-2.5-flash-preview-tts` : 30 juin 2026
+- `gemini-2.5-pro-preview-tts` : 30 juin 2026
+- `gemini-2.5-computer-use-preview` : 30 avril 2026
+- `gemini-robotics-er-1.5-preview` : 30 avril 2026
 
 ### 5.4 Ressources Officielles
 
@@ -628,3 +749,41 @@ export GEMINI_API_KEY="$GEMINI_API_KEY_NEW"
 | gemini-2.5-pro | 15 | 30,000 |
 | gemini-2.5-flash | 60 | 1,000,000 |
 | gemini-2.5-flash-lite | 60 | 1,000,000 |
+
+---
+
+## Annexe C : Limites Techniques par Type de Fichier
+
+Pour éviter les erreurs `400 Bad Request`, respectez les limites suivantes :
+
+| Type de Fichier | Taille Maximale | Quantité Maximale | Durée Maximale |
+|-----------------|-----------------|-------------------|----------------|
+| **Images** | 20 MB | 16 images par requête | - |
+| **Vidéos** | 2048 MB (2 GB) | - | 60 minutes |
+| **Audio** | 512 MB | - | - |
+| **Documents (PDF/TXT)** | 30 MB | - | - |
+
+**Conseils :**
+- Compressez les images avant envoi (WebP recommandé)
+- Pour les vidéos longues, découpez en segments ou extrayez des frames clés
+- Vérifiez la taille des fichiers avec `countTokens` ou via API avant envoi
+
+---
+
+## Annexe D : Catégories de Sécurité Disponibles
+
+L'API Gemini propose les catégories de filtrage de sécurité suivantes :
+
+| Catégorie | Description |
+|-----------|-------------|
+| `HARM_CATEGORY_HATE_SPEECH` | Discours haineux et harcèlement |
+| `HARM_CATEGORY_DANGEROUS_CONTENT` | Contenu dangereux (armes, drogues, etc.) |
+| `HARM_CATEGORY_HARASSMENT` | Harcèlement et intimidation |
+| `HARM_CATEGORY_SEXUALLY_EXPLICIT` | Contenu sexuellement explicite |
+| `HARM_CATEGORY_CIVIC_INTEGRITY` | Désinformation civique et électorale |
+
+**Niveaux de seuil disponibles :**
+- `BLOCK_NONE` : Aucun blocage
+- `BLOCK_ONLY_HIGH` : Bloquer uniquement le contenu à haut risque
+- `BLOCK_MEDIUM_AND_ABOVE` : Bloquer contenu moyen et haut risque
+- `BLOCK_LOW_AND_ABOVE` : Bloquer tout contenu risqué (par défaut)
