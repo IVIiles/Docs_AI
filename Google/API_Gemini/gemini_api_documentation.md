@@ -17,12 +17,14 @@
 
 ## 1. Quickstart
 
-### 1.1 Installation du SDK Google GenAI
+### 1.1 Installation du SDK Google Generative AI
 
 #### Python (Python 3.9+)
 ```bash
-pip install -q -U google-genai
+pip install -q -U google-generativeai
 ```
+
+> **Note** : Le package officiel est `google-generativeai` (importé comme `genai`).
 
 #### JavaScript/Node.js (Node.js v18+)
 ```bash
@@ -77,16 +79,20 @@ console.log(response.text);
 
 ### 1.4 Modèles Disponibles (Décembre 2025)
 
-| Modèle | Type | Contexte | Sortie Max | Statut |
-|--------|------|----------|------------|--------|
-| `gemini-2.5-pro` | Polyvalent (code, raisonnement) | 1,048,576 tokens | 65,536 tokens | Stable |
-| `gemini-2.5-flash` | Rapide, haute performance | 1,048,576 tokens | 65,536 tokens | Stable |
-| `gemini-2.5-flash-lite` | Optimisé coût/volume | 1,048,576 tokens | 65,536 tokens | Stable |
-| `gemini-2.5-flash-image` | Génération d'images (Nano Banana) | Variable | Variable | Stable |
-| `gemini-2.5-flash-native-audio-preview-12-2025` | Audio natif (Live API) | Variable | Variable | Preview |
-| `gemini-2.5-flash-preview-tts` | Text-to-Speech | Variable | Variable | Preview |
-| `gemini-2.5-pro-preview-tts` | TTS Pro | Variable | Variable | Preview |
-| `gemini-2.5-computer-use-preview-10-2025` | Agent informatique | Variable | Variable | Preview |
+| Modèle | Type | Contexte | Sortie Max | Knowledge Cutoff | Statut |
+|--------|------|----------|------------|------------------|--------|
+| `gemini-2.5-pro` | Polyvalent (code, raisonnement) | 2,097,152 tokens | 65,536 tokens | Août 2025 | Stable |
+| `gemini-2.5-flash` | Rapide, haute performance | 1,048,576 tokens | 65,536 tokens | Août 2025 | Stable |
+| `gemini-2.5-flash-lite` | Optimisé coût/volume | 1,048,576 tokens | 65,536 tokens | Août 2025 | Stable |
+| `gemini-2.5-flash-image` | Génération d'images (Nano Banana) | Variable | Variable | Août 2025 | Stable |
+| `gemini-2.5-flash-native-audio-preview-12-2025` | Audio natif (Live API) | Variable | Variable | Décembre 2025 | Preview |
+| `gemini-2.5-flash-preview-tts` | Text-to-Speech | Variable | Variable | Décembre 2025 | Preview |
+| `gemini-2.5-pro-preview-tts` | TTS Pro | Variable | Variable | Décembre 2025 | Preview |
+| `gemini-2.5-computer-use-preview-10-2025` | Agent informatique | Variable | Variable | Août 2025 | Preview |
+
+**Notes importantes :**
+- **gemini-2.5-pro** supporte désormais jusqu'à **2,097,152 tokens** de contexte (2M+), un argument majeur pour les documents très longs.
+- **Knowledge Cutoff** : Août 2025 pour la série 2.5 standard, Décembre 2025 pour les modèles audio preview.
 
 **Modèles Dépréciés :**
 - `gemini-2.0-flash` → Déprécié
@@ -280,6 +286,210 @@ while job.state == "RUNNING":
 results = client.batches.results.get(job.name)
 ```
 
+### 3.5 Function Calling (Appel de Fonctions)
+
+Le **Function Calling** permet au modèle d'interagir avec des outils externes (bases de données, APIs tierces) pour créer de véritables agents opérationnels.
+
+#### Python - Déclaration et Appel de Fonctions
+
+```python
+from google import genai
+from google.genai.types import GenerateContentConfig, FunctionDeclaration, Tool
+
+client = genai.Client()
+
+# Déclarer les fonctions disponibles
+get_weather = FunctionDeclaration(
+    name="get_weather",
+    description="Obtenir la météo actuelle pour une ville donnée",
+    parameters={
+        "type": "object",
+        "properties": {
+            "city": {"type": "string", "description": "Nom de la ville"},
+            "unit": {"type": "string", "enum": ["celsius", "fahrenheit"], "description": "Unité de température"}
+        },
+        "required": ["city"]
+    }
+)
+
+search_database = FunctionDeclaration(
+    name="search_database",
+    description="Rechercher des informations dans la base de données",
+    parameters={
+        "type": "object",
+        "properties": {
+            "query": {"type": "string", "description": "Requête de recherche"}
+        },
+        "required": ["query"]
+    }
+)
+
+# Créer un outil avec les fonctions
+tools = [Tool(function_declarations=[get_weather, search_database])]
+
+# Appel avec function calling
+response = client.models.generate_content(
+    model="gemini-2.5-pro",
+    contents="Quelle est la météo à Paris aujourd'hui ?",
+    config=GenerateContentConfig(tools=tools)
+)
+
+# Vérifier si le modèle demande d'appeler une fonction
+if response.function_calls:
+    for call in response.function_calls:
+        print(f"Fonction appelée: {call.name}")
+        print(f"Arguments: {call.args}")
+        # Exécuter la fonction réelle ici
+        # result = execute_function(call.name, call.args)
+        # Envoyer le résultat au modèle pour continuer
+```
+
+#### JavaScript - Function Calling
+
+```javascript
+import { GoogleGenAI } from "@google/genai";
+
+const client = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+const getWeatherFunction = {
+  name: "get_weather",
+  description: "Obtenir la météo actuelle pour une ville donnée",
+  parameters: {
+    type: "object",
+    properties: {
+      city: { type: "string", description: "Nom de la ville" },
+      unit: { type: "string", enum: ["celsius", "fahrenheit"], description: "Unité de température" }
+    },
+    required: ["city"]
+  }
+};
+
+const response = await client.models.generateContent({
+  model: "gemini-2.5-pro",
+  contents: "Quelle est la météo à Paris ?",
+  config: {
+    tools: [{ functionDeclarations: [getWeatherFunction] }]
+  }
+});
+
+if (response.functionCalls) {
+  for (const call of response.functionCalls) {
+    console.log(`Fonction: ${call.name}`);
+    console.log(`Args: ${JSON.stringify(call.args)}`);
+  }
+}
+```
+
+**Cas d'usage typiques :**
+- Recherche en base de données
+- Appels APIs tierces (météo, stocks, actualités)
+- Exécution de commandes système
+- Interactions avec services externes
+
+### 3.6 Grounding (Ancrage via Google Search)
+
+Le **Grounding** permet au modèle de vérifier ses réponses en temps réel sur le web via l'outil `google_search_retrieval`, réduisant les hallucinations.
+
+#### Python - Activer Google Search
+
+```python
+from google import genai
+from google.genai.types import GenerateContentConfig, GoogleSearchRetrieval
+
+client = genai.Client()
+
+# Activer la recherche Google
+search_tool = GoogleSearchRetrieval()
+
+response = client.models.generate_content(
+    model="gemini-2.5-pro",
+    contents="Quelles sont les dernières nouvelles sur l'IA en décembre 2025 ?",
+    config=GenerateContentConfig(
+        tools=[search_tool],
+        temperature=0.3  # Température basse recommandée pour grounding
+    )
+)
+
+print(response.text)
+
+# Accéder aux sources utilisées
+if response.grounding_metadata and response.grounding_metadata.search_entry_point:
+    print("Sources consultées:")
+    for source in response.grounding_metadata.grounding_chunks:
+        print(f"- {source.title}: {source.uri}")
+```
+
+#### JavaScript - Grounding avec Search
+
+```javascript
+import { GoogleGenAI } from "@google/genai";
+
+const client = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+const response = await client.models.generateContent({
+  model: "gemini-2.5-pro",
+  contents: "Qui a gagné le prix Nobel de physique 2025 ?",
+  config: {
+    tools: [{ googleSearchRetrieval: {} }]
+  }
+});
+
+console.log(response.text);
+
+// Afficher les sources
+if (response.groundingMetadata?.groundingChunks) {
+  console.log("Sources:");
+  response.groundingMetadata.groundingChunks.forEach(chunk => {
+    console.log(`- ${chunk.web?.title}: ${chunk.web?.uri}`);
+  });
+}
+```
+
+**Avantages du Grounding :**
+- Réponses basées sur des informations à jour
+- Réduction significative des hallucinations
+- Citations automatiques des sources
+- Idéal pour : actualités, faits récents, données vérifiées
+
+### 3.7 Response Schema (JSON Structuré)
+
+Pour garantir un format JSON valide, utilisez un **Response Schema** qui définit la structure attendue.
+
+```python
+from google import genai
+from google.genai.types import GenerateContentConfig, ResponseSchema
+
+client = genai.Client()
+
+# Définir le schéma de réponse attendu
+schema = {
+    "type": "object",
+    "properties": {
+        "name": {"type": "string"},
+        "age": {"type": "integer"},
+        "email": {"type": "string"},
+        "skills": {"type": "array", "items": {"type": "string"}}
+    },
+    "required": ["name", "email"]
+}
+
+response = client.models.generate_content(
+    model="gemini-2.5-flash",
+    contents="Génère un profil utilisateur fictif",
+    config=GenerateContentConfig(
+        response_mime_type="application/json",
+        response_schema=schema  # Schéma structuré requis
+    )
+)
+
+# Le JSON retourné respecte toujours le schéma
+import json
+data = json.loads(response.text)
+print(data["name"])
+```
+
+**Note** : Depuis fin 2025, le mode JSON (`application/json`) nécessite souvent un `response_schema` pour garantir la validité du format.
+
 ---
 
 ## 4. Optimisation
@@ -313,8 +523,10 @@ print(f"Tokens: {token_count.total_tokens}")
 | Chat temps réel | gemini-2.5-flash | $ | Très faible |
 | Code complexe | gemini-2.5-pro | $$$ | Moyenne |
 | Volume élevé | gemini-2.5-flash-lite | ¢ | Faible |
-| Documents 1M tokens | gemini-2.5-pro/flash | $$ | Moyenne |
+| Documents 2M tokens | gemini-2.5-pro (2M context) | $$ | Moyenne |
 | Audio conversationnel | gemini-2.5-flash-native-audio | $$ | Très faible |
+| Agent avec outils | gemini-2.5-pro + Function Calling | $$$ | Moyenne |
+| Infos à jour | gemini-2.5-pro + Grounding | $$$ | Moyenne |
 
 ### 4.4 Parallelisation
 
@@ -386,6 +598,8 @@ export GEMINI_API_KEY="$GEMINI_API_KEY_NEW"
 | Input > 200K | $4.00 |
 | Output | $12.00 - $18.00 |
 
+**Note** : gemini-2.5-pro supporte jusqu'à **2,097,152 tokens** de contexte.
+
 ### Gemini 2.5 Flash
 | Type | Prix / 1M tokens |
 |------|------------------|
@@ -400,7 +614,10 @@ export GEMINI_API_KEY="$GEMINI_API_KEY_NEW"
 | Input (audio) | $0.25 |
 | Output | $0.75 |
 
-**Notes** : Batch API -50% | Free Tier limité
+**Notes** : 
+- Batch API -50% sur tous les modèles
+- Free Tier limité disponible
+- Function Calling et Grounding inclus sans surcoût (comptés comme tokens normaux)
 
 ---
 
